@@ -1,0 +1,8 @@
+{
+    "monthly_limit": 500,
+    "current_usage": 190,
+    "appliance_status": {
+        "Air Conditioner": "off",
+        "Refrigerator": "off"
+    }
+}
