@@ -205,85 +205,60 @@
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import json
 
 app = Flask(__name__)
 CORS(app)
 
-# Mock database file
-DATA_FILE = "data.json"
+# Simulated database
+energy_data = {
+    "monthly_limit": 100,  # Default limit in kWh
+    "current_usage": 0,    # Energy used so far
+    "remaining_budget": 100,
+    "appliances": [
+        {"name": "Air Conditioner", "usage": 2},
+        {"name": "Refrigerator", "usage": 0.8},
+        {"name": "Washing Machine", "usage": 1.5},
+        {"name": "Television", "usage": 0.2},
+        {"name": "Fan", "usage": 0.1}
+    ]
+}
 
-def load_data():
-    try:
-        with open(DATA_FILE, "r") as file:
-            return json.load(file)
-    except FileNotFoundError:
-        return {
-            "monthly_limit": 100,  # Default monthly limit in kWh
-            "current_usage": 0,    # Current total usage in kWh
-            "appliance_status": {},  # Tracks ON/OFF status
-            "appliance_data": {  # Default appliances with power ratings in kW
-                "Air Conditioner": {"power": 1.5, "usage": 0},
-                "Refrigerator": {"power": 0.2, "usage": 0},
-                "Washing Machine": {"power": 0.5, "usage": 0},
-                "Television": {"power": 0.1, "usage": 0},
-                "Fan": {"power": 0.075, "usage": 0}
-            }
-        }
-
-def save_data(data):
-    with open(DATA_FILE, "w") as file:
-        json.dump(data, file, indent=4)
-
-# Route to update the monthly limit
-@app.route('/set_limit', methods=['POST'])
-def set_limit():
-    request_data = request.get_json()
-    data = load_data()
-    
-    if "monthly_limit" in request_data:
-        data["monthly_limit"] = request_data["monthly_limit"]
-        save_data(data)
-        return jsonify({"message": "Monthly limit updated successfully"}), 200
-    
-    return jsonify({"error": "Invalid request"}), 400
-
-# Route to get usage and remaining budget
-@app.route('/get_usage', methods=['GET'])
+@app.route("/get_usage", methods=["GET"])
 def get_usage():
-    data = load_data()
-    remaining_budget = data["monthly_limit"] - data["current_usage"]
-    return jsonify({
-        "current_usage": data["current_usage"],
-        "remaining_budget": remaining_budget,
-        "monthly_limit": data["monthly_limit"],
-        "appliance_data": data["appliance_data"]
-    })
+    """Returns current electricity usage data."""
+    energy_data["remaining_budget"] = max(0, energy_data["monthly_limit"] - energy_data["current_usage"])
+    return jsonify(energy_data)
 
-# Route to toggle appliance ON/OFF
-@app.route('/toggle_appliance', methods=['POST'])
+@app.route("/set_limit", methods=["POST"])
+def set_limit():
+    """Updates the monthly electricity limit."""
+    data = request.json
+    energy_data["monthly_limit"] = data.get("monthly_limit", energy_data["monthly_limit"])
+    return jsonify({"message": "Monthly limit updated successfully!"})
+
+@app.route("/toggle_appliance", methods=["POST"])
 def toggle_appliance():
-    data = load_data()
-    request_data = request.get_json()
+    """Toggles an appliance ON/OFF."""
+    data = request.json
+    appliance_name = data.get("appliance")
+    status = data.get("status")
 
-    appliance = request_data.get("appliance")
-    action = request_data.get("action")
+    if status == "ON":
+        energy_data["current_usage"] += next((a["usage"] for a in energy_data["appliances"] if a["name"] == appliance_name), 0)
+    
+    return jsonify({"message": f"{appliance_name} turned {status}"})
 
-    if not appliance or not action:
-        return jsonify({"error": "Invalid request"}), 400
+@app.route("/esp32_status", methods=["POST"])
+def esp32_status():
+    """Receives data from ESP32."""
+    data = request.json
+    energy_consumed = data.get("energy_consumed", 0)
+    energy_data["current_usage"] += energy_consumed
+    return jsonify({"message": "ESP32 data received"})
 
-    data["appliance_status"][appliance] = action
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
 
-    # Simulate power consumption if appliance is ON
-    if action == "ON":
-        power = data["appliance_data"][appliance]["power"]
-        data["appliance_data"][appliance]["usage"] += power  # Increment usage
 
-    save_data(data)
-
-    return jsonify({"message": f"{appliance} turned {action.upper()}"}), 200
-
-if __name__ == '__main__':
-    app.run(debug=True)
 
 
