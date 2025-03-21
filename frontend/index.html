@@ -1,50 +1,9 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Electricity Management App</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <h1>Electricity Management Dashboard</h1>
-
-    <section id="budget-tracker">
-        <h2>Budget Tracker</h2>
-        <input type="number" id="monthly-limit" placeholder="Monthly Limit (kWh)">
-        <input type="number" id="current-usage" placeholder="Current Usage (kWh)" readonly>
-        <button onclick="trackUsage()">Track Usage</button>
-        <p id="remaining-budget"></p>
-    </section>
-
-    <section id="appliance-control">
-        <h2>Appliance Control</h2>
-        <select id="appliance">
-            <option value="Air Conditioner">Air Conditioner</option>
-            <option value="Heater">Heater</option>
-            <option value="Refrigerator">Refrigerator</option>
-        </select>
-        <button onclick="toggleAppliance('on')">Turn ON</button>
-        <button onclick="toggleAppliance('off')">Turn OFF</button>
-        <p id="appliance-status"></p>
-    </section>
-
-    Add missing Socket.IO library -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
-    <script src="script.js"></script>
-</body>
-</html> -->
-
-<!-- 
-end OF FIRST CODE -->
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Electricity Usage Tracker</title>
+    <title>Electricity Management Dashboard</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -52,6 +11,7 @@ end OF FIRST CODE -->
     <div class="container">
         <h1>Electricity Management Dashboard</h1>
 
+        <!-- Budget Tracker -->
         <div class="section">
             <h2>Budget Tracker</h2>
             <label for="monthly-limit">Set Monthly Limit (kWh):</label>
@@ -60,11 +20,20 @@ end OF FIRST CODE -->
             <p id="remaining-budget">Remaining Budget: -- kWh</p>
         </div>
 
+        <!-- Current Usage -->
         <div class="section">
             <h2>Current Usage</h2>
             <input type="text" id="current-usage" readonly>
+            <button onclick="trackUsage()">Update Usage</button>
         </div>
 
+        <!-- AI Recommendations -->
+        <div class="section ai-recommendation">
+            <h2>AI Recommendation</h2>
+            <p id="ai-recommendation">Fetching recommendation...</p>
+        </div>
+
+        <!-- Appliance Control -->
         <div class="section">
             <h2>Control Appliances</h2>
             <select id="appliance">
@@ -80,6 +49,7 @@ end OF FIRST CODE -->
             <p id="appliance-status"></p>
         </div>
 
+        <!-- Appliance Usage Overview -->
         <div class="section">
             <h2>Appliance Usage Overview</h2>
             <ul id="appliance-list"></ul>
