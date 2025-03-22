@@ -41,9 +41,9 @@ def ai_recommendation():
                 energy_data["current_usage"] -= appliance["usage"]
                 update_remaining_budget()
                 return f"⚠️ High usage detected! {appliance['name']} was turned OFF to save power."
-        return "⚠️ Energy usage is too high! Turn off more appliances manually."
+        return "⚠️ Energy usage is too high! All the appliances are turned off."
     elif energy_data["current_usage"] > energy_data["monthly_limit"] * 0.7:
-        return "⚠️ Energy usage is approaching the limit. Consider turning off some appliances."
+        return "⚠️ Energy usage is approaching the limit. Appliances are going to be turned off soon.."
     
     return "✅ Energy usage is optimal."
 
